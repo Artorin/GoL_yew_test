@@ -108,8 +108,9 @@ impl Component for App {
     fn create(ctx: &Context<Self>) -> Self {
         let callback = ctx.link().callback(|_| Msg::Tick);
         let interval = Interval::new(200, move || callback.emit(()));
-
-        let (cellules_width, cellules_height) = (253,240);
+        
+        // size
+        let (cellules_width, cellules_height) = (50,50);
 
         Self {
             active: false,
@@ -185,7 +186,6 @@ impl Component for App {
             <div>
                 <section class="game-container">
                     <header class="app-header">
-                        <img alt="The app logo" src="favicon.ico" class="app-logo"/>
                         <h1 class="app-title">{ "Game of Life" }</h1>
                     </header>
                     <section class="game-area">
@@ -194,7 +194,6 @@ impl Component for App {
                         </div>
                         <div class="game-buttons">
                             <button class="game-button" onclick={ctx.link().callback(|_| Msg::Random)}>{ "Random" }</button>
-                            <button class="game-button" onclick={ctx.link().callback(|_| Msg::Step)}>{ "Step" }</button>
                             <button class="game-button" onclick={ctx.link().callback(|_| Msg::Start)}>{ "Start" }</button>
                             <button class="game-button" onclick={ctx.link().callback(|_| Msg::Stop)}>{ "Stop" }</button>
                             <button class="game-button" onclick={ctx.link().callback(|_| Msg::Reset)}>{ "Reset" }</button>
