@@ -47,8 +47,7 @@ impl App {
         for row in 0..self.cellules_height {
             for col in 0..self.cellules_width {
                 let neighbors = self.neighbors(row as isize, col as isize);
-
-                let current_idx = self.row_col_as_idx(row as isize, col as isize);
+                let current_idx = (row * self.cellules_width + col) as usize;
                 if self.cellules[current_idx].is_alive() {
                     if Cellule::alone(&neighbors) || Cellule::overpopulated(&neighbors) {
                         to_dead.push(current_idx);
@@ -67,24 +66,27 @@ impl App {
     }
 
     fn neighbors(&self, row: isize, col: isize) -> [Cellule; 8] {
-        [
-            self.cellules[self.row_col_as_idx(row + 1, col)],
-            self.cellules[self.row_col_as_idx(row + 1, col + 1)],
-            self.cellules[self.row_col_as_idx(row + 1, col - 1)],
-            self.cellules[self.row_col_as_idx(row - 1, col)],
-            self.cellules[self.row_col_as_idx(row - 1, col + 1)],
-            self.cellules[self.row_col_as_idx(row - 1, col - 1)],
-            self.cellules[self.row_col_as_idx(row, col - 1)],
-            self.cellules[self.row_col_as_idx(row, col + 1)],
-        ]
+        let mut neighbors = [Cellule::new_dead(); 8];
+
+        let indices = [
+            (1, 0), (1, 1), (1, -1),
+            (-1, 0), (-1, 1), (-1, -1),
+            (0, -1), (0, 1),
+        ];
+    
+        for (i, (d_row, d_col)) in indices.iter().enumerate() {
+            let new_row = row + d_row;
+            let new_col = col + d_col;
+    
+            if new_row >= 0 && new_row < self.cellules_height as isize &&
+               new_col >= 0 && new_col < self.cellules_width as isize {
+                neighbors[i] = self.cellules[(new_row * self.cellules_width as isize + new_col) as usize];
+            }
+        }
+    
+        neighbors
     }
 
-    fn row_col_as_idx(&self, row: isize, col: isize) -> usize {
-        let row = wrap(row, self.cellules_height as isize);
-        let col = wrap(col, self.cellules_width as isize);
-
-        row * self.cellules_width + col
-    }
 
     fn view_cellule(&self, idx: usize, cellule: &Cellule, link: &Scope<Self>) -> Html {
         let cellule_status = {
@@ -107,7 +109,8 @@ impl Component for App {
 
     fn create(ctx: &Context<Self>) -> Self {
         let callback = ctx.link().callback(|_| Msg::Tick);
-        let interval = Interval::new(200, move || callback.emit(()));
+        // speed
+        let interval = Interval::new(10, move || callback.emit(()));
         
         // size
         let (cellules_width, cellules_height) = (50,50);
@@ -211,16 +214,6 @@ impl Component for App {
     }
 }
 
-fn wrap(coord: isize, range: isize) -> usize {
-    let result = if coord < 0 {
-        coord + range
-    } else if coord >= range {
-        coord - range
-    } else {
-        coord
-    };
-    result as usize
-}
 
 fn main() {
     wasm_logger::init(wasm_logger::Config::default());
