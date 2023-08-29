@@ -738,7 +738,7 @@ async function __wbg_init(input) {
     if (wasm !== undefined) return wasm;
 
     if (typeof input === 'undefined') {
-        input = new URL('game_of_life-df5fb6e003d6d30_bg.wasm', import.meta.url);
+        input = new URL('game_of_life-5a2e60543c4364c_bg.wasm', import.meta.url);
     }
     const imports = __wbg_get_imports();
 
