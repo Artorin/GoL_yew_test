@@ -113,7 +113,7 @@ impl Component for App {
         let interval = Interval::new(10, move || callback.emit(()));
         
         // size
-        let (cellules_width, cellules_height) = (25,25);
+        let (cellules_width, cellules_height) = (50,50);
 
         Self {
             active: false,
